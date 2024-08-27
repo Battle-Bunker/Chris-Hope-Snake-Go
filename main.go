@@ -17,8 +17,12 @@ func main() {
 	}
 
 	portfolio := agent.NewPortfolio(
+		agent.NewHeuristic(1.0, "alive-allies", HeuristicAliveAllies),
 		agent.NewHeuristic(1.0, "team-health", HeuristicHealth),
 		agent.NewHeuristic(1.0, "food-proximity", HeuristicFoodProximity),
+		agent.NewHeuristic(10.0, "length", HeuristicRelativeLength),
+		agent.NewHeuristic(1.0, "floodfill", HeuristicFloodFill),
+		
 	)
 
 	snakeAgent := agent.NewSnakeAgent(portfolio, metadata)
@@ -26,4 +30,3 @@ func main() {
 
 	server.Start()
 }
-
