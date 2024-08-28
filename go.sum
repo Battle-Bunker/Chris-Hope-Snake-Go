@@ -1,5 +1,11 @@
 github.com/Battle-Bunker/cyphid-snake v1.0.7 h1:L8mUbdAbmRKVjO8VKCEh2NqCqSZCFI6XdW8fNGB0SH8=
 github.com/Battle-Bunker/cyphid-snake v1.0.7/go.mod h1:oqNiKQKgKa+VVc6xAY23uEwX53Lr0L/6PUiQ8o/5BZ8=
+github.com/Battle-Bunker/cyphid-snake v1.0.8 h1:XNH9xWDcIUqivO/cq/HtnxqsFUWA/Pzw4P2GaIVRdGk=
+github.com/Battle-Bunker/cyphid-snake v1.0.8/go.mod h1:oqNiKQKgKa+VVc6xAY23uEwX53Lr0L/6PUiQ8o/5BZ8=
+github.com/Battle-Bunker/cyphid-snake v1.0.9 h1:SMyzWvmxjSf1MGS+HTKFmODNppqV6KOuZEONEXSOTgU=
+github.com/Battle-Bunker/cyphid-snake v1.0.9/go.mod h1:oqNiKQKgKa+VVc6xAY23uEwX53Lr0L/6PUiQ8o/5BZ8=
+github.com/Battle-Bunker/cyphid-snake v1.0.10 h1:rP2/ocVePJfMR0oLLRNmQlxW4b+BP/mf3WRhU71QVAg=
+github.com/Battle-Bunker/cyphid-snake v1.0.10/go.mod h1:oqNiKQKgKa+VVc6xAY23uEwX53Lr0L/6PUiQ8o/5BZ8=
 github.com/BattlesnakeOfficial/rules v1.2.3 h1:loESL0qdvO31WbBIhd3VCsLrmfeqqx4F715UejagLrk=
 github.com/BattlesnakeOfficial/rules v1.2.3/go.mod h1:/q/fRd/c3bZm78r/12LV4zavN1MwKg6xtkYzpgOprtg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

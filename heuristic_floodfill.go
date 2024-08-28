@@ -1,26 +1,35 @@
 package main
 
 import (
-	"github.com/Battle-Bunker/cyphid-snake/agent"
+	"math"
+
 	"github.com/BattlesnakeOfficial/rules"
+	"github.com/Battle-Bunker/cyphid-snake/agent"
 )
 
-// HeuristicFloodFill calculates the sum of free spaces available to allied snakes
+// HeuristicFloodFill calculates a heuristic score based on available space for each ally snake
 func HeuristicFloodFill(snapshot agent.GameSnapshot) float64 {
-	totalFreeSpaces := 0.0
+	totalScore := 0.0
 	for _, allySnake := range snapshot.YourTeam() {
-		freeSpaces := floodFill(snapshot, allySnake.Head())
-		totalFreeSpaces += float64(freeSpaces)
+		rawScore := floodFillScore(snapshot, allySnake)
+		transformedScore := transformScore(rawScore)
+		totalScore += transformedScore
 	}
-	return totalFreeSpaces
+	return totalScore
 }
 
-// floodFill performs a flood fill algorithm to count free spaces
-func floodFill(snapshot agent.GameSnapshot, start rules.Point) int {
-	width, height := snapshot.Width(), snapshot.Height()
+// transformScore applies a sigmoid-like function to flatten the output to at most 100 points per snake
+func transformScore(score float64) float64 {
+	maxScore := 100.0
+	k := 0.05 // Adjusts the steepness of the curve
+	return maxScore * (2 / (1 + math.Exp(-k*score)) - 1)
+}
+
+func floodFillScore(snapshot agent.GameSnapshot, snake agent.SnakeSnapshot) float64 {
 	visited := make(map[rules.Point]bool)
-	queue := []rules.Point{start}
-	count := 0
+	queue := []rules.Point{snake.Head()}
+	score := 0.0
+	snakeTail := snake.Body()[len(snake.Body())-1]
 
 	for len(queue) > 0 {
 		current := queue[0]
@@ -29,41 +38,61 @@ func floodFill(snapshot agent.GameSnapshot, start rules.Point) int {
 		if visited[current] {
 			continue
 		}
-
 		visited[current] = true
-		count++
 
-		// Check adjacent cells
-		for _, dir := range []rules.Point{{X: 0, Y: 1}, {X: 0, Y: -1}, {X: 1, Y: 0}, {X: -1, Y: 0}} {
-			next := rules.Point{X: current.X + dir.X, Y: current.Y + dir.Y}
-			if isValidMove(snapshot, next, width, height) {
-				queue = append(queue, next)
+		// Add to score for each accessible cell
+		score++
+
+		// Check if we've reached the snake's tail
+		if current == snakeTail {
+			score += float64(snake.Length()) * 3
+		}
+
+		// Add neighboring cells to the queue
+		neighbors := getNeighbors(current, snapshot.Width(), snapshot.Height())
+		for _, neighbor := range neighbors {
+			if !visited[neighbor] && isValidMove(snapshot, neighbor) {
+				queue = append(queue, neighbor)
 			}
 		}
 	}
 
-	return count
+	return score
 }
 
-// isValidMove checks if a move to the given point is valid
-func isValidMove(snapshot agent.GameSnapshot, p rules.Point, width, height int) bool {
-	// Check bounds
-	if p.X < 0 || p.X >= width || p.Y < 0 || p.Y >= height {
-		return false
+func getNeighbors(p rules.Point, width, height int) []rules.Point {
+	neighbors := []rules.Point{
+		{X: p.X, Y: p.Y - 1}, // Up
+		{X: p.X, Y: p.Y + 1}, // Down
+		{X: p.X - 1, Y: p.Y}, // Left
+		{X: p.X + 1, Y: p.Y}, // Right
 	}
 
-	// Check for collision with snakes
+	validNeighbors := []rules.Point{}
+	for _, n := range neighbors {
+		if n.X >= 0 && n.X < width && n.Y >= 0 && n.Y < height {
+			validNeighbors = append(validNeighbors, n)
+		}
+	}
+	return validNeighbors
+}
+
+func isValidMove(snapshot agent.GameSnapshot, p rules.Point) bool {
+	// Check if the point is occupied by any snake's body (except tails)
 	for _, snake := range snapshot.Snakes() {
-		for _, bodyPart := range snake.Body() {
-			if p == bodyPart {
+		for i, bodyPart := range snake.Body() {
+			if i == len(snake.Body())-1 {
+				continue // Skip tail
+			}
+			if bodyPart == p {
 				return false
 			}
 		}
 	}
 
-	// Check for hazards (optional, depending on game rules)
+	// Check if the point is a hazard
 	for _, hazard := range snapshot.Hazards() {
-		if p == hazard {
+		if hazard == p {
 			return false
 		}
 	}
